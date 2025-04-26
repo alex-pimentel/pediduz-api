@@ -2,7 +2,9 @@ import { Options } from '@mikro-orm/core';
 import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import * as dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({
+  path: `.env.${process.env.NODE_ENV || ''}`, 
+});
 
 const config: Options<PostgreSqlDriver> = {
   // Removed 'type' as it is not a valid property for Mikro-ORM configuration
