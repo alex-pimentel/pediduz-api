@@ -3,37 +3,39 @@ import { InjectRepository} from '@mikro-orm/nestjs';
 import { EntityRepository, EntityManager } from '@mikro-orm/core';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
+import { Users } from '../../database/entities/Users';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: EntityRepository<User>,
+    @InjectRepository(Users)
+    private readonly userRepository: EntityRepository<Users>,
     private readonly em: EntityManager, // Inject EntityManager
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: CreateUserDto): Promise<Users> {
     const newUser = this.userRepository.create({
       email: createUserDto.email,
       name: createUserDto.name,
       password: createUserDto.password,
       active: createUserDto.active ?? true,
-      plan_status: createUserDto.plan_status ?? 'free',
+      planStatus: createUserDto.planStatus ?? 'free',
+      apiToken: createUserDto.apiToken ?? '',
+      rejectedorders: createUserDto.rejectedorders ?? 0,  
     });
     await this.em.persistAndFlush(newUser); // Use EntityManager to persist and flush
     return newUser;
   }
 
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<Users[]> {
     return await this.userRepository.findAll();
   }
 
-  async findOne(id: number): Promise<User | null> {
+  async findOne(id: number): Promise<Users | null> {
     return await this.userRepository.findOne({ id });
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<User | null> {
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<Users | null> {
     const user = await this.userRepository.findOne({ id });
     if (!user) {
       return null;
